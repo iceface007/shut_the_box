@@ -4,14 +4,15 @@ struct TwoDice {
     first_dice: i8,
     second_dice: i8,
 }
+
+#[derive(Copy, Clone)]
 struct Board {
     moves: i8,
     open_flaps: [bool; 9],
-    //Strategie/Heuristik kann man dann später hier noch irgendwo implementiern 
 } 
 
 impl Board {
-    fn roll_the_dice(mut self: Board) -> TwoDice {
+    fn roll_the_dice(self: &mut Board) -> TwoDice {
         self.moves += 1;
 
         let mut rng: rand::rngs::ThreadRng = rand::thread_rng();
@@ -22,6 +23,12 @@ impl Board {
 
         two_dice
     }
+
+    fn close_flaps(self: &mut Board, number_of_points: i8) {
+
+        let index: usize = (number_of_points - 1).try_into().unwrap();
+        self.open_flaps[index] = true;
+    }
 }
 
 impl TwoDice {
@@ -30,11 +37,9 @@ impl TwoDice {
 
         sum
     }
-
-    //Auch ein möglicher nächster Schritt: fn close_flap()
 }
 fn main() {
-    let board: Board = Board { 
+    let mut board: Board = Board { 
         moves: 0, 
         open_flaps: [false; 9], 
     };
@@ -47,7 +52,10 @@ fn main() {
 
     let sum = dice.sum_of_dice();
 
-    print!("Sum of dice: {sum}");
+    println!("Sum of dice: {sum}");
+    board.close_flaps(dice.first_dice);
+
+    visualize(board.open_flaps);
 }
 
 //Nächster Schritt: fn play_a_turn()
